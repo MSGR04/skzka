@@ -32,12 +32,13 @@ func registerHandler(users store.UserStore) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid payload"})
 			return
 		}
-		if err := users.Register(req.Username, req.Password); err != nil {
-			if errors.Is(err, ErrConflict) {
+		_, err := users.Register(req.Username, req.Password)
+		if err != nil {
+			if err == store.ErrConflict {
 				c.JSON(http.StatusConflict, gin.H{"error": "user exists"})
 				return
 			}
-			c.JSON(http.StatusConflict, gin.H{"error": "user exists"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to register"})
 			return
 		}
 		c.Status(http.StatusCreated)
@@ -52,6 +53,7 @@ func loginHandler(users store.UserStore) gin.HandlerFunc {
 		}
 		token, err := users.Login(req.Username, req.Password)
 		if err != nil {
+			c.Header("WWW-Authenticate", `Bearer realm="api", error="invalid_credentials"`)
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 			return
 		}

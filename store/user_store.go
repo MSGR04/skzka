@@ -8,14 +8,10 @@ import (
 )
 
 var (
-	ErrConflict = errors.New("conflict")
-	ErrUnauth   = errors.New("unauthorized")
+	ErrConflict     = errors.New("conflict")
+	ErrUnauth       = errors.New("unauthorized")
+	ErrInvalidToken = errors.New("invalid token")
 )
-
-type UserStore interface {
-	Register(username, password string) error
-	Login(username, password string) (string, error)
-}
 
 type User struct {
 	ID       int64  `json:"id"`
@@ -83,4 +79,19 @@ func (u *InMemoryUserStore) Login(username, password string) (string, error) {
 		SessionID: token,
 	}
 	return token, nil
+}
+
+func (u *InMemoryUserStore) GetUserByToken(token string) (*User, error) {
+	u.mu.RLock()
+	defer u.mu.RUnlock()
+
+	sess, ok := u.sessions[token]
+	if !ok {
+		return nil, ErrInvalidToken
+	}
+	user, ok := u.usersByID[sess.UserID]
+	if !ok {
+		return nil, ErrInvalidToken
+	}
+	return user, nil
 }
