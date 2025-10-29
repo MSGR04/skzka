@@ -1,0 +1,204 @@
+basePath: /
+definitions:
+  main.ErrorResponse:
+    properties:
+      error:
+        example: task not found
+        type: string
+    type: object
+  main.LoginRequest:
+    properties:
+      password:
+        example: password228
+        type: string
+      username:
+        example: user_123
+        type: string
+    type: object
+  main.RegisterRequest:
+    properties:
+      password:
+        example: password228
+        type: string
+      username:
+        example: user_123
+        type: string
+    type: object
+  main.ResultResponse:
+    properties:
+      result:
+        example: some_junk_payload
+        type: string
+    type: object
+  main.StatusResponse:
+    properties:
+      status:
+        example: in_progress
+        type: string
+    type: object
+  main.TaskCreatedResponse:
+    properties:
+      status:
+        example: created
+        type: string
+      task_id:
+        example: 6b7a9d2e-...
+        type: string
+    type: object
+  main.TokenResponse:
+    properties:
+      token:
+        example: f2f1d2a7-...
+        type: string
+    type: object
+host: 127.0.0.1:8000
+info:
+  contact: {}
+  description: Простое API для регистрации, логина и асинхронных тасок.
+  title: HW2 Task API
+  version: "1.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Логин. Возвращает токен
+      parameters:
+      - description: User credentials
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Login user
+      tags:
+      - auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Регистрация нового пользователя
+      parameters:
+      - description: User credentials
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Register user
+      tags:
+      - auth
+  /result/{task_id}:
+    get:
+      description: Получить результат таски
+      parameters:
+      - description: Task ID (UUID)
+        in: path
+        name: task_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.ResultResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "409":
+          description: task not ready
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Get task result
+      tags:
+      - task
+  /status/{task_id}:
+    get:
+      description: Получить статус таски
+      parameters:
+      - description: Task ID (UUID)
+        in: path
+        name: task_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.StatusResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Get task status
+      tags:
+      - task
+  /task:
+    post:
+      description: Создать таск; обработка выполняется асинхронно
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.TaskCreatedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Create task
+      tags:
+      - task
+schemes:
+- http
+swagger: "2.0"
