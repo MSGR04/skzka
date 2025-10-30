@@ -5,11 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="13529605-5a23-45b0-8cf9-8ba616a8003c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/store/session_store.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/auth_middleware.go" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/auth_middleware.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/task_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/task_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/user_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/user_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/store/session_store.go" beforeDir="false" afterPath="$PROJECT_DIR$/store/session_store.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/store/user_store.go" beforeDir="false" afterPath="$PROJECT_DIR$/store/user_store.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test2.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test2.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

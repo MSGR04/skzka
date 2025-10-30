@@ -22,8 +22,8 @@ type Session struct {
 
 type SessionStore interface {
 	Create(userID int64) (string, error)
-	Get(token int64) (*Session, error)
-	Destroy(token int64) error
+	Get(token string) (*Session, error)
+	Destroy(token string) error
 	GC(maxLifeTime time.Duration)
 }
 type InMemorySessionStore struct {

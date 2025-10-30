@@ -68,7 +68,7 @@ func (u *InMemoryUserStore) Login(username, password string) (string, error) {
 	return u.sessions.Create(user.ID)
 }
 
-func (u *InMemoryUserStore) GetUserByToken(token int64) (*User, error) {
+func (u *InMemoryUserStore) GetUserByToken(token string) (*User, error) {
 	sess, err := u.sessions.Get(token)
 	if err != nil {
 		return nil, ErrUnauth

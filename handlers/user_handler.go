@@ -34,6 +34,10 @@ func registerHandler(users store.UserStore) gin.HandlerFunc {
 		}
 		_, err := users.Register(req.Username, req.Password)
 		if err != nil {
+			if errors.Is(err, store.ErrConflict) {
+				c.Status(http.StatusCreated)
+				return
+			}
 			if err == store.ErrConflict {
 				c.JSON(http.StatusConflict, gin.H{"error": "user exists"})
 				return
