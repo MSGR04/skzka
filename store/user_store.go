@@ -3,14 +3,11 @@ package store
 import (
 	"errors"
 	"sync"
-
-	"github.com/google/uuid"
 )
 
 var (
-	ErrConflict     = errors.New("conflict")
-	ErrUnauth       = errors.New("unauthorized")
-	ErrInvalidToken = errors.New("invalid token")
+	ErrConflict = errors.New("conflict")
+	ErrUnauth   = errors.New("unauthorized")
 )
 
 type User struct {
@@ -19,13 +16,8 @@ type User struct {
 	Password string `json:"password"`
 }
 
-type Session struct {
-	UserID    int64  `json:"user_id"`
-	SessionID string `json:"session_id"`
-}
-
 type UserStore interface {
-	Register(username, password string) error
+	Register(username, password string) (int64, error)
 	Login(username, password string) (string, error)
 	GetUserByToken(token string) (*User, error)
 }
@@ -35,14 +27,14 @@ type InMemoryUserStore struct {
 	nextID       int64
 	usersByLogin map[string]*User
 	usersByID    map[int64]*User
-	sessions     map[string]*Session
+	sessions     SessionStore
 }
 
-func NewInMemoryUserStore() *InMemoryUserStore {
+func NewInMemoryUserStore(sess SessionStore) *InMemoryUserStore {
 	return &InMemoryUserStore{
 		usersByLogin: make(map[string]*User),
 		usersByID:    make(map[int64]*User),
-		sessions:     make(map[string]*Session),
+		sessions:     sess,
 	}
 }
 
@@ -73,25 +65,19 @@ func (u *InMemoryUserStore) Login(username, password string) (string, error) {
 	if !ok || user.Password != password {
 		return "", ErrUnauth
 	}
-	token := uuid.NewString()
-	u.sessions[token] = &Session{
-		UserID:    user.ID,
-		SessionID: token,
-	}
-	return token, nil
+	return u.sessions.Create(user.ID)
 }
 
-func (u *InMemoryUserStore) GetUserByToken(token string) (*User, error) {
+func (u *InMemoryUserStore) GetUserByToken(token int64) (*User, error) {
+	sess, err := u.sessions.Get(token)
+	if err != nil {
+		return nil, ErrUnauth
+	}
 	u.mu.RLock()
 	defer u.mu.RUnlock()
-
-	sess, ok := u.sessions[token]
-	if !ok {
-		return nil, ErrInvalidToken
-	}
-	user, ok := u.usersByID[sess.UserID]
-	if !ok {
-		return nil, ErrInvalidToken
+	user := u.usersByID[sess.UserID]
+	if user == nil {
+		return nil, ErrUnauth
 	}
 	return user, nil
 }

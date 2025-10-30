@@ -11,14 +11,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterTaskRoutes(r *gin.Engine, ts storepkg.TaskStore) {
-	r.POST("/task", taskHandler(ts))
-	r.GET("/status/:task_id", statusHandler(ts))
-	r.GET("/result/:task_id", resultHandler(ts))
+func RegisterTaskRoutes(r *gin.Engine, ts storepkg.TaskStore, users storepkg.UserStore) {
+	g := r.Group("/", AuthMiddleware(users))
+	g.POST("/task", taskHandler(ts))
+	g.GET("/status/:task_id", statusHandler(ts))
+	g.GET("/result/:task_id", resultHandler(ts))
 }
 
 func taskHandler(ts storepkg.TaskStore) gin.HandlerFunc {
 	return func(c *gin.Context) {
+
 		taskID, err := ts.CreateTask()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create task"})

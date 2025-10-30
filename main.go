@@ -2,8 +2,9 @@ package main
 
 import (
 	"hw2hard/handlers"
-	"hw2hard/store"
 	"log"
+	"hw2hard/store"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -15,6 +16,15 @@ type UUIDGen struct{}
 func (UUIDGen) New() string { return uuid.NewString() }
 
 func main() {
+	sessionStore := store.NewInMemorySessionStore()
+
+	go func() {
+		ticker := time.NewTicker(30 * time.Minute)
+		defer ticker.Stop()
+		for range ticker.C {
+			sessionStore.GC(24 * time.Hour)
+		}
+	}()
 
 	str := store.NewInMemoryTaskStore(UUIDGen{})
 	users := store.NewInMemoryUserStore()
